@@ -85,7 +85,10 @@ export default function Home() {
     <div className="p-[0 2rem]">
       <Head>
         <title>EOM Solver</title>
-        <meta name="description" content="Generated with next-template" />
+        <meta
+          name="description"
+          content="Interactive equation of motion solver written in typescript"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
