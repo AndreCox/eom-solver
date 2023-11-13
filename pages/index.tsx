@@ -139,14 +139,14 @@ export default function Home() {
       </Head>
 
       <main className="min-h-screen p-4 flex flex-1 flex-col justify-center items-center text-4xl">
-        <h1 className="text-5xl font-bold bg-gradient-to-bl from-orange-500 to-pink-500 text-transparent bg-clip-text">
+        <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-bl from-orange-500 to-pink-500 text-transparent bg-clip-text">
           EOM Solver
         </h1>
-        <p className="text-2xl text-center text-white">
+        <p className=" text-xl md:text-2xl text-center text-white">
           A tool for solving equations of motion for a rigid body
         </p>
 
-        <div className="flex flex-row gap-12 justify-center mt-12">
+        <div className="flex flex-row flex-wrap gap-12 md:gap-y-0 gap-y-4 justify-center mt-6 md:mt-12">
           <div className="flex flex-col space-y-2">
             <div className="w-full justify-center flex flex-row">
               <span className="text-white text-lg">Step Size</span>
@@ -163,7 +163,7 @@ export default function Home() {
             />
             <input
               type="number"
-              className="bg-transparent  text-center text-white"
+              className="bg-transparent  text-center text-white text-2xl md:text-4xl"
               value={step}
               step={0.01}
               max={1}
@@ -196,7 +196,7 @@ export default function Home() {
 
             <input
               type="number"
-              className="bg-transparent text-center text-white"
+              className="bg-transparent  text-center text-white text-2xl md:text-4xl"
               value={timeRange[0]}
               step={1}
               max={150}
@@ -234,7 +234,7 @@ export default function Home() {
 
             <input
               type="number"
-              className="bg-transparent text-center text-white"
+              className="bg-transparent  text-center text-white text-2xl md:text-4xl"
               value={timeRange[1]}
               step={1}
               max={150}
@@ -250,13 +250,13 @@ export default function Home() {
             />
           </div>
         </div>
-        <div className="flex flex-row justify-evenly gap-12">
+        <div className="flex flex-row justify-evenly md:gap-12 flex-wrap">
           <div className="flex flex-col justify-center">
-            <span className="text-white text-3xl pt-6 text-center">
+            <span className="text-white text-2xl md:text-3xl pt-6 text-center">
               Initial Conditions
             </span>
             <div className="flex flex-row justify-center pt-4">
-              <span className="text-white">
+              <span className="text-white md:text-3xl text-lg">
                 &#7818; ={" "}
                 <input
                   type="number"
@@ -279,10 +279,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col justify-center">
-            <span className="text-white text-3xl pt-6 text-center">
+            <span className="text-white text-2xl md:text-3xl pt-6 text-center">
               Solver Type
             </span>
-            <div className="flex flex-row justify-center pt-4 gap-6">
+            <div className="flex flex-row justify-center pt-4 gap-6 text-lg md:text-3xl">
               {/* add two toggle buttons to switch between runge kuter and euler */}
               <button
                 className={`${
@@ -312,13 +312,12 @@ export default function Home() {
           {/* it the values should be editiable */}
 
           <div className="flex flex-col space-y-2">
-            <div className="w-full justify-center flex flex-col pt-12 pb-6">
-              <span className="text-white text-3xl text-center">
+            <div className="w-full justify-center flex flex-col pt-4 md:pt-12 pb-6">
+              <span className="text-white text-2xl md:text-3xl pt-6 text-center">
                 Equation of motion
               </span>
-              <div className="flex flex-row justify-center"></div>
             </div>
-            <span className="text-white text-center align-text-top h-full ">
+            <span className="text-white text-center align-text-top h-full space-y-4 text-lg md:text-3xl pb-4">
               {/* we want to add an input below that fits to the size of the entered text */}
               <input
                 type="number"
