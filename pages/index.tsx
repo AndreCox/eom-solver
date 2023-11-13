@@ -135,7 +135,7 @@ export default function Home() {
           name="description"
           content="Interactive equation of motion solver written in typescript"
         />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="favicon.ico" />
       </Head>
 
       <main className="min-h-screen p-4 flex flex-1 flex-col justify-center items-center text-4xl">
