@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { use, useEffect, useState } from "react";
-import eomSolver from "../math/eomsolver";
+import { eulerEomSolver, rungeEomSolver } from "../math/eomsolver";
 import { State } from "../math/eomsolver";
 import { evaluate } from "mathjs";
 import Fraction from "fraction.js";
@@ -33,6 +33,8 @@ export default function Home() {
 
   const [history, setHistory] = useState<number[][]>([]);
 
+  const [runge, setRunge] = useState(false);
+
   const polyMorphicEom = (
     t: number,
     x: number,
@@ -41,8 +43,36 @@ export default function Home() {
     // this function changes the equation of motion based on the input
     // we want to use the mathjs library to parse the equation based on the input
     // first take equals and replace the t with the t passed in
-    const parsedEquation = equals.replace("t", t.toString());
+    // we want to make sure not to accidentally replace t in words like tan or sqrt cot.
+    const dangerWords = ["tan", "sqrt", "cot"];
+    let parsedEquation = equals;
+    // replace all t's with the value of t
+    // first find all danger words so we don't replace t in them
+    const dangerWordsLocations: number[] = [];
+    // first check if the equation contains any danger words
+    for (let i = 0; i < dangerWords.length; i++) {
+      if (parsedEquation.includes(dangerWords[i])) {
+        // if it does find the index of the t in the danger word in the equation
+        const index = parsedEquation.indexOf(dangerWords[i]);
+        // get the position of t in the danger word
+        const positionOfT = dangerWords[i].indexOf("t");
 
+        // add the index of t to the danger words locations
+        dangerWordsLocations.push(index + positionOfT);
+      }
+    }
+
+    // now we replace the t's that are not in danger words with the value of t
+    for (let i = 0; i < parsedEquation.length; i++) {
+      if (parsedEquation[i] === "t") {
+        // check if the index is in danger words
+        if (!dangerWordsLocations.includes(i)) {
+          // replace the t with the value of t
+          parsedEquation =
+            parsedEquation.slice(0, i) + t + parsedEquation.slice(i + 1);
+        }
+      }
+    }
     // then we convert the string using mathjs
     try {
       evaluate(parsedEquation);
@@ -65,21 +95,37 @@ export default function Home() {
   useEffect(() => {
     let history: number[][] = [];
 
-    history = eomSolver(
-      polyMorphicEom,
-      {
-        x,
-        v,
-      },
-      {
-        start: timeRange[0],
-        end: timeRange[1],
-      },
-      step
-    );
+    if (runge) {
+      history = rungeEomSolver(
+        polyMorphicEom,
+        {
+          x,
+          v,
+        },
+        {
+          start: timeRange[0],
+          end: timeRange[1],
+        },
+        step
+      );
+    } else {
+      history = eulerEomSolver(
+        polyMorphicEom,
+        {
+          x,
+          v,
+        },
+        {
+          start: timeRange[0],
+          end: timeRange[1],
+        },
+        step
+      );
+    }
 
     setHistory(history);
-  }, [step, timeRange, equals, xCoef, vCoef, aCoef, x, v]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, timeRange, equals, xCoef, vCoef, aCoef, x, v, runge]);
 
   return (
     <div className="p-[0 2rem]">
@@ -204,31 +250,61 @@ export default function Home() {
             />
           </div>
         </div>
-        <div className="flex flex-col justify-center">
-          <span className="text-white text-3xl pt-6 text-center">
-            Initial Conditions
-          </span>
-          <div className="flex flex-row justify-center pt-4">
-            <span className="text-white">
-              &#7818; ={" "}
-              <input
-                type="number"
-                className=" bg-zinc-800 p-1 px-2 rounded-xl text-white box-border w-20 mx-2"
-                value={v}
-                onChange={(e) => {
-                  setV(parseFloat(e.target.value));
-                }}
-              />
-              X ={" "}
-              <input
-                type="number"
-                className=" bg-zinc-800 p-1 px-2 rounded-xl text-white box-border w-20 mx-2"
-                value={x}
-                onChange={(e) => {
-                  setX(parseFloat(e.target.value));
-                }}
-              />
+        <div className="flex flex-row justify-evenly gap-12">
+          <div className="flex flex-col justify-center">
+            <span className="text-white text-3xl pt-6 text-center">
+              Initial Conditions
             </span>
+            <div className="flex flex-row justify-center pt-4">
+              <span className="text-white">
+                &#7818; ={" "}
+                <input
+                  type="number"
+                  className=" bg-zinc-800 p-1 px-2 rounded-xl text-white box-border w-20 mx-2"
+                  value={v}
+                  onChange={(e) => {
+                    setV(parseFloat(e.target.value));
+                  }}
+                />
+                X ={" "}
+                <input
+                  type="number"
+                  className=" bg-zinc-800 p-1 px-2 rounded-xl text-white box-border w-20 mx-2"
+                  value={x}
+                  onChange={(e) => {
+                    setX(parseFloat(e.target.value));
+                  }}
+                />
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col justify-center">
+            <span className="text-white text-3xl pt-6 text-center">
+              Solver Type
+            </span>
+            <div className="flex flex-row justify-center pt-4 gap-6">
+              {/* add two toggle buttons to switch between runge kuter and euler */}
+              <button
+                className={`${
+                  runge ? " bg-green-700 " : "bg-zinc-800"
+                } rounded-xl p-2 px-4 text-white transition-all`}
+                onClick={() => {
+                  setRunge(true);
+                }}
+              >
+                Runge
+              </button>
+              <button
+                className={`${
+                  runge ? "bg-zinc-800" : "bg-green-700"
+                } rounded-xl p-2 px-4 text-white`}
+                onClick={() => {
+                  setRunge(false);
+                }}
+              >
+                Euler
+              </button>
+            </div>
           </div>
         </div>
         <div className="flex flex-row justify-center">
@@ -316,6 +392,32 @@ export default function Home() {
             animation: {
               duration: 100,
               easing: "linear",
+            },
+            events: [
+              "mousemove",
+              "mouseout",
+              "click",
+              "touchstart",
+              "touchmove",
+            ],
+            plugins: {
+              tooltip: {
+                usePointStyle: true,
+                // display the x and y values on hovering over a point
+                callbacks: {
+                  label: function (context: any) {
+                    var label = context.dataset.label || "";
+
+                    if (label) {
+                      label += ": ";
+                    }
+                    if (context.parsed.y !== null) {
+                      label += new Fraction(context.parsed.y).toFraction(true);
+                    }
+                    return label;
+                  },
+                },
+              },
             },
           }}
         />
