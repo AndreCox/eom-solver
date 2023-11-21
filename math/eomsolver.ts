@@ -17,10 +17,6 @@ interface TimeSpan {
   end: number;
 }
 
-const testEom = (t: number, x: number, v: number): number => {
-  return -x;
-};
-
 const eulerEomSolver = (
   eom: (t: number, x: number, v: number) => number,
   initialState: {
@@ -36,12 +32,17 @@ const eulerEomSolver = (
   let x = initialState.x;
   let v = initialState.v;
 
+  if (stepSize < 0.0001) {
+    return history;
+  }
+
   let totalSteps = timeSpan.end / stepSize;
 
+  history.push([t, x]);
+
   for (let i = 0; i < totalSteps; i++) {
-    let a = eom(t, x, v);
     x += v * stepSize;
-    v += a * stepSize;
+    v += eom(t, x, v) * stepSize;
     t += stepSize;
     // make sure t does not have weird decimal places
     t = Math.round(t * 1000000) / 1000000;
